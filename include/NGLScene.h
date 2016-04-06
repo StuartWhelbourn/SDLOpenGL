@@ -1,13 +1,15 @@
 #ifndef NGLSCENE_H__
 #define NGLSCENE_H__
+
 #include <ngl/Camera.h>
 #include <ngl/Colour.h>
 #include <ngl/Light.h>
 #include <ngl/Transformation.h>
 #include <ngl/Text.h>
 #include <QOpenGLWindow>
-#include "boid.h"
-#include <vector> /
+#include <QOpenGLWidget>
+#include "flock.h"
+#include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @file NGLScene.h
@@ -22,14 +24,16 @@
 /// put in this file
 //----------------------------------------------------------------------------------------------------------------------
 
-class NGLScene : public QOpenGLWindow
+class NGLScene : public QOpenGLWidget, public flock
 {
+  Q_OBJECT
   public:
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief ctor for our NGL drawing class
     /// @param [in] parent the parent window to the class
     //----------------------------------------------------------------------------------------------------------------------
-    NGLScene();
+
+    NGLScene(QWidget *_parent);
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief dtor must close down ngl and release OpenGL resources
     //----------------------------------------------------------------------------------------------------------------------
@@ -44,7 +48,15 @@ class NGLScene : public QOpenGLWindow
     //----------------------------------------------------------------------------------------------------------------------
     void paintGL();
 
-private:
+   public slots :
+    /// @brief a slot to toggle option
+    /// @param[in] _mode the mode passed from the toggle button
+    ///
+    void toggleOption(
+                          bool _mode
+                        );
+
+   private:
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief this is called everytime we resize the window
     //----------------------------------------------------------------------------------------------------------------------
@@ -91,7 +103,10 @@ private:
     //----------------------------------------------------------------------------------------------------------------------
     int m_height;
 
-    std::vector <boid *> m_boid; //has to be a pointer
+    /// @brief variable for slot toggle
+    bool m_mode;
+
+
 
     void timerEvent(QTimerEvent *m_event);
 

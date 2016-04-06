@@ -5,27 +5,27 @@
 #include <ngl/Transformation.h>
 #include <ngl/VAOPrimitives.h>
 
-boid::boid(ngl::Vec3 _startPos, const ngl::Camera *_cam)
+boid::boid(ngl::Vec3 _startLoc, const ngl::Camera *_cam)
 {
-  m_pos = _startPos;
-  m_startPos = _startPos;
+  m_loc = _startLoc;
+  m_startLoc = _startLoc;
   ngl::Random *rng = ngl::Random::instance();
-  m_maxLife = rng->randomPositiveNumber(30)+2; //life is at least 2
+  m_maxLife = rng->randomPositiveNumber(200)+100; //life is at least 100
   m_colour = rng->getRandomColour();
-  m_dir = rng->getRandomNormalizedVec3();
+  m_vel = rng->getRandomNormalizedVec3();
   m_camera = _cam;
 }
 
-void boid::update()
+void boid::updateBoid()
 {
   if(++m_life >= m_maxLife)
   {
-    m_pos=m_startPos;
+    m_loc=m_startLoc;
     m_life=0;
   }
   else
   {
-    m_pos += m_dir;
+    m_loc += m_vel;
   }
 
 }
@@ -34,7 +34,7 @@ void boid::draw() const
 {
 
   ngl::Transformation tx;
-  tx.setPosition(m_pos);
+  tx.setPosition(m_loc);
   ngl::ShaderLib *shader = ngl::ShaderLib::instance();
   shader->use("nglColourShader");
   shader->setUniform("Colour",m_colour);

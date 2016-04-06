@@ -1,14 +1,28 @@
 #include <QMouseEvent>
 #include <QGuiApplication>
 
+#include <iostream>
 #include "NGLScene.h"
 #include <ngl/NGLInit.h>
 #include <iostream>
+#include <vector>
+#include <ngl/Light.h>
+#include "flock.h"
 
-NGLScene::NGLScene()
+
+
+
+NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget(_parent)
 {
+
   // re-size the widget to that of the parent (in this case the GLFrame passed in on construction)
-  setTitle("Blank NGL");
+
+  setFocus();
+
+  // re-size the widget to that of a parent
+  this->resize(_parent->size());
+
+  m_mode=false;
 }
 
 
@@ -42,17 +56,20 @@ void NGLScene::initializeGL()
   // enable multisampling for smoother drawing
   glEnable(GL_MULTISAMPLE);
 
-  m_camera.set(ngl::Vec3(0,0,30),ngl::Vec3(0,0,0),ngl::Vec3(0,1,0));
+  //create the camera
+  m_camera.set(ngl::Vec3(0,0,200),ngl::Vec3(0,0,0),ngl::Vec3(0,1,0));
   m_camera.setShape(45.0f,float(width()/height()),0.5f,100.0f);
 
-  for(int i = 0; i<2000; ++i)
+  for(int i = 0; i<1000; ++i)
   {
-    m_boid.push_back(new boid(ngl::Vec3(0.0f, 0.0f, 0.0f), &m_camera));
+    m_boidList.push_back(new boid(ngl::Vec3(0.0f, 0.0f, 0.0f), &m_camera));
+
+
   }
 
 
 
-  startTimer(10);
+  startTimer(1);
 
   ngl::VAOPrimitives::instance()->createSphere("sphere",1.0,20);
 
@@ -68,9 +85,13 @@ void NGLScene::paintGL()
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glViewport(0,0,m_width,m_height);
 
-  for(auto *p : m_boid)
+  if(m_mode == true)
+  {
+
+  for(auto *p : m_boidList)
   {
     p->draw();
+  }
   }
 
 }
@@ -119,9 +140,17 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
 
 void NGLScene::timerEvent(QTimerEvent * _event)
 {
-  for(auto *p : m_boid)
+  for(auto *p : m_boidList)
   {
-    p->update();
+    p->updateBoid();
   }
+  update();
+}
+
+
+void NGLScene::toggleOption(bool _mode
+                           )
+{
+  m_mode = _mode;
   update();
 }
